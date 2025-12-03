@@ -1,0 +1,13 @@
+git_token.txt
+*qgz
+prithvi_local_repo/
+hls_foundation_os/
+.vscode/
+__pycache__/
+data/
+examples/
+
+uv.lock
+pyproject.toml
+requirements.txt
+.python-version

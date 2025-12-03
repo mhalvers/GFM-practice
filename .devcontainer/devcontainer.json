@@ -1,0 +1,7 @@
+{
+  "name": "My Project",
+  "build": {
+    "dockerfile": "../Dockerfile"
+  },
+  "workspaceFolder": "/home/user/app"
+}
