@@ -14,7 +14,8 @@ A more fine-grained list of objectives follows:
 - [ ] Run inference on multiband HLS imagery for crop-coverage
   - ✅ Using Huggingface Docker file run locally
   - ❌ Using local Python environment
-    - [ ] Need to update inference script to accommodate modern OpenMMLab API
+    - Failed thus far.  Python 3.8 required, but it is not compatible with VS Code Python debugger.  OpenMMLab API changed drastically since Python 3.8.
+  - [ ] Need to update inference script to accommodate modern OpenMMLab API
   - [ ] Containerize new Python environment
   - [ ] Deploy onto cloud service with API
 - [ ] Locally fine tune foundational model to predict 🤔
