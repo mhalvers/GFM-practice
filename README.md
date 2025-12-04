@@ -1,10 +1,21 @@
 # EO foundational model inference and fine tuning (self-directed training)
 
-## To do list
+## Objective
 
-- Run inference.py but with the weights from a fine-tuned crop classification model (e.g., Prithvi-EO-1.0-100M-multi-temporal-crop-classification)
-  - might need to  get a specific inference.py script
+The governing objective is to learn how to run inference on finely-tuned models, and to fine-tune a foundational model.  For this excercise
+I have chosen to use the [IBM-NASA Prithvi Models Family](https://huggingface.co/ibm-nasa-geospatial)
 
-## Notes
+A more fine-grained list of objectives follows:
 
-- Until now (Friday, November 21), I was running inference with the foundational model. The foundational model is desgined to form the basis of fine-tuning for a specific purpose (e.g., flooding).
+## Checklist
+
+- ✅ Understand foundational model architecture and capabilities
+- ✅ Build a script to download HLS imagery from the Microsoft Planetary Computer archive
+- [ ] Run inference on multiband HLS imagery for crop-coverage
+  - ✅ Using Huggingface Docker file run locally
+  - ❌ Using local Python environment
+    - [ ] Need to update inference script to accommodate modern OpenMMLab API
+  - [ ] Containerize new Python environment
+  - [ ] Deploy onto cloud service with API
+- [ ] Locally fine tune foundational model to predict 🤔
+- [ ] Exlore could services to speed up fine tuning
