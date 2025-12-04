@@ -19,3 +19,9 @@ A more fine-grained list of objectives follows:
   - [ ] Deploy onto cloud service with API
 - [ ] Locally fine tune foundational model to predict 🤔
 - [ ] Exlore could services to speed up fine tuning
+
+## Acknowledgments
+
+This project utilizes the [Prithvi Models Family](https://huggingface.co/ibm-nasa-geospatial) developed by IBM and NASA. Special thanks to the IBM-NASA Geospatial AI team for creating these foundational models for Earth observation tasks.
+
+## Notes
