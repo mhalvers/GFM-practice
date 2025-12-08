@@ -8,13 +8,9 @@ import rioxarray
 import torchvision.transforms.functional as F
 from mmcv.parallel import DataContainer as DC
 # from mmengine.structures import base_data_element as DC
-from mmengine.registry import Registry
-# from mmseg.datasets.builder import PIPELINES
+from mmseg.datasets.builder import PIPELINES
 from torchvision import transforms
 
-PIPELINES = Registry('pipeline')
-
-from mmcv.transforms import TRANSFORMS
 
 
 
@@ -23,7 +19,7 @@ def open_tiff(fname):
     return data.to_numpy()
 
 
-@TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class ConstantMultiply(object):
     """Multiply image by constant.
 
@@ -51,7 +47,7 @@ class ConstantMultiply(object):
         return results
 
 
-@TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class BandsExtract(object):
 
     """Extract bands from image. Assumes channels last
@@ -81,7 +77,7 @@ class BandsExtract(object):
         return results
 
 
-@TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class TorchRandomCrop(object):
 
     """
@@ -103,7 +99,7 @@ class TorchRandomCrop(object):
         return results
 
 
-@TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class TorchNormalize(object):
     """Normalize the image.
 
@@ -133,7 +129,7 @@ class TorchNormalize(object):
         return results
 
 
-@TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class Reshape(object):
     """
     It reshapes a tensor.
@@ -163,7 +159,7 @@ class Reshape(object):
         return results
 
 
-@TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class CastTensor(object):
     """
 
@@ -185,7 +181,7 @@ class CastTensor(object):
         return results
 
 
-@TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class CollectTestList(object):
     """
 
@@ -233,8 +229,8 @@ class CollectTestList(object):
         )
 
 
-# @PIPELINES.register_module()
-@TRANSFORMS.register_module()
+# @TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class TorchPermute(object):
     """Permute dimensions.
 
@@ -259,8 +255,7 @@ class TorchPermute(object):
         return self.__class__.__name__ + f"(keys={self.keys}, order={self.order})"
 
 
-# @PIPELINES.register_module()
-@TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class LoadGeospatialImageFromFile(object):
     """
 
@@ -317,8 +312,7 @@ class LoadGeospatialImageFromFile(object):
         return repr_str
 
 
-# @PIPELINES.register_module()
-@TRANSFORMS.register_module()
+@PIPELINES.register_module()
 class LoadGeospatialAnnotations(object):
     """Load annotations for semantic segmentation.
 

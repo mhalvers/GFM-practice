@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from mmseg.utils import add_prefix
-from mmseg.models.utils import resize
+from mmseg.core import add_prefix
+from mmseg.ops import resize
 from mmseg.models import builder
 from mmseg.models.builder import SEGMENTORS
 from mmseg.models.segmentors.base import BaseSegmentor

@@ -1,9 +1,7 @@
-from mmengine.registry import Registry
-from mmengine.dataset import BaseDataset as CustomDataset
-# from mmseg.datasets.custom import CustomDataset
+from mmseg.datasets.custom import CustomDataset
 from .geospatial_pipelines import LoadGeospatialAnnotations
+from mmseg.datasets.builder import DATASETS
 
-DATASETS = Registry('dataset')
 
 @DATASETS.register_module()
 class GeospatialDataset(CustomDataset):

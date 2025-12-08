@@ -21,6 +21,10 @@ A more fine-grained list of objectives follows:
 - [ ] Locally fine tune foundational model to predict 🤔
 - [ ] Exlore could services to speed up fine tuning
 
+## Running the inference app in Docker
+
+`docker run -it --rm -v $PWD:/home/user/app -w /home/user/app -p 7860:7860 myapp`
+
 ## Acknowledgments
 
 This project utilizes the [Prithvi Models Family](https://huggingface.co/ibm-nasa-geospatial) developed by IBM and NASA. Special thanks to the IBM-NASA Geospatial AI team for creating these foundational models for Earth observation tasks.
