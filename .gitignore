@@ -8,6 +8,7 @@ __pycache__/
 data/
 examples/
 
+.venv/
 uv.lock
 pyproject.toml
 requirements.txt

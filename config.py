@@ -5,6 +5,9 @@ DATA_DIR = Path.home() / "data_science/geospatial/mpls_land_use/data"
 # Minneapolis-St. Paul metro area bounding box
 BBOX = [-94.22608230, 44.53677921, -92.51781747, 45.36347663]
 
+HLS_CRS = "EPSG:32615"  # UTM zone 15N
+
+
 # max cloud cover percentage for searches
 MAX_CLOUD_COVER = 1  # in percent
 

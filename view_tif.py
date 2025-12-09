@@ -1,4 +1,5 @@
 # %%
+import numpy as np
 import xarray as xr
 import rioxarray as rxr
 import matplotlib.pyplot as plt
@@ -6,19 +7,50 @@ from PIL import Image
 
 from config import DATA_DIR
 
-# thumbnails
-FILES = sorted(DATA_DIR.rglob("thumbnail.tif"))
-
 xr.set_options(display_style="text", display_expand_data=False)
 
-# %%
-[f.parent.name + " / " + f.name for f in FILES]
+# %% view the app.py example chips
+# FILES = sorted(list(Path(".").rglob("chip*.tif")))
+# rxr.open_rasterio(FILES[0])
+
+# %%thumbnails of downloaded HLS imagery
+THUMBNAILS = sorted(DATA_DIR.rglob("thumbnail.tif"))
+RED = sorted(DATA_DIR.rglob("B04.tif"))
+
+
+# %% find the bbox that surrounds all images
+xmin, xmax, ymin, ymax = [], [], [], []
+
+for f in RED:
+    da = rxr.open_rasterio(f).squeeze()
+    xmin.append(da.x.min().item())
+    xmax.append(da.x.max().item())
+    ymin.append(da.y.min().item())
+    ymax.append(da.y.max().item())
+
+xmin = np.min(xmin)
+xmax = np.max(xmax)
+ymin = np.min(ymin)
+ymax = np.max(ymax)
+
+# %% display red band
+_, ax = plt.subplots(3, 2, figsize=(10, 10))
+ax = ax.ravel()
+for i, f in enumerate(RED):
+    da = rxr.open_rasterio(f, mask_and_scale=True).squeeze()
+    da.plot.imshow(ax=ax[i], vmin=0, vmax=1, add_colorbar=False)
+    ax[i].set_title(f.parent.name)
+    ax[i].set_xlabel(None)
+    ax[i].set_ylabel(None)
+    ax[i].set_xticklabels([])
+    ax[i].set_yticklabels([])
+    ax[i].set_xlim(xmin, xmax)
+    ax[i].set_ylim(ymin, ymax)
 
 # %% display thumbnails
-# open with matplotlib
-_, ax = plt.subplots(2, 2, figsize=(10, 10))    
+_, ax = plt.subplots(3, 2, figsize=(10, 10))    
 ax = ax.ravel()
-for i, f in enumerate(FILES[0:4]):
+for i, f in enumerate(THUMBNAILS):
     img = Image.open(f)
     ax[i].imshow(img)
     ax[i].set_title(f.parent.name)
