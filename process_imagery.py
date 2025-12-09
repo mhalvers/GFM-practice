@@ -13,15 +13,20 @@ from config import DATA_DIR, BBOX, HLS_CRS
 
 xr.set_options(display_style="text")
 
-N_JOBS = 6
+N_JOBS = 1
 
 
-def convert_latlon_bbox_to_hls_crs(bbox):
-    geom = box(*bbox)
+def convert_bbox_crs(bbox):
+    geom = box(*bbox) # box(xmin, ymin, xmax, ymax, ccw=True, **kwargs)
     gdf = gpd.GeoDataFrame({"geometry": [geom]}, crs="EPSG:4326")
     gdf = gdf.to_crs(HLS_CRS)
 
-    return gdf.total_bounds.tolist()  # minx, miny, maxx, maxy
+    minx = gdf.bounds.minx.item()
+    miny = gdf.bounds.miny.item()
+    maxx = gdf.bounds.maxx.item()
+    maxy = gdf.bounds.maxy.item()
+
+    return [minx, miny, maxx, maxy]
 
 
 def bands_to_multiband_tif(image_path: Path, bbox: list[float] = None) -> xr.DataArray:
@@ -35,7 +40,7 @@ def bands_to_multiband_tif(image_path: Path, bbox: list[float] = None) -> xr.Dat
             xr.DataArray: Processed data array with bands as a dimension.
     """
 
-    bands = list(image_path.glob("B*tif"))
+    bands = sorted(list(image_path.glob("B*tif")))
 
     ds_list = []
     for band in bands:
@@ -56,11 +61,12 @@ def process_and_save_image(image: Path, bbox: list[float] = None) -> tuple[Path,
 
     Args:
         image: Path to the image directory
+        bbox: Optional bounding box to clip the image [minx, miny, maxx, maxy]
 
     Returns:
         Tuple of (output_file_path, success)
     """
-    
+
     try:
         ds = bands_to_multiband_tif(image, bbox=bbox)
         file_name = image.parent / f"{image.name}_processed.tif"
@@ -73,7 +79,7 @@ def process_and_save_image(image: Path, bbox: list[float] = None) -> tuple[Path,
 
 
 def merge_adjacent_tiles(
-    processed_tifs: list[Path], output_path: Path = DATA_DIR, bounds: list[float] = None
+    processed_tifs: list[Path], output_path: Path = DATA_DIR, bbox: list[float] = None
 ) -> Path:
     """Merge adjacent tiles taken on the same day into a single raster."""
 
@@ -97,7 +103,7 @@ def merge_adjacent_tiles(
     # load each in with rasterio and merge
     ds = merge_datasets(
         [rioxarray.open_rasterio(f, band_as_variable=True) for f in duplicates],
-        bounds=bounds,
+        bounds=bbox,
     )
 
     # ds = ds.rename({band:ds[band].attrs["long_name"] for band in ds})
@@ -115,44 +121,43 @@ def merge_adjacent_tiles(
 
 if __name__ == "__main__":
 
-    bbox = convert_latlon_bbox_to_hls_crs(BBOX)
+    bbox = convert_bbox_crs(BBOX)
 
-    images = sorted(list(DATA_DIR.glob("HLS*")))
-    if not images:
-        raise ValueError(f"No image folders found in {DATA_DIR}")
+    # images = sorted(list(DATA_DIR.glob("HLS*")))
+    # if not images:
+    #     raise ValueError(f"No image folders found in {DATA_DIR}")
 
 
-    if N_JOBS==1:
-        print(f"Processing {len(images)} images sequentially...")
-        # Process sequentially (easier for debugging)
-        completed = 0
-        for img in tqdm(images, desc="Processing images"):
-            _, success = process_and_save_image(img)
-            if success:
-                completed += 1
+    # if N_JOBS==1:
+    #     print(f"Processing {len(images)} images sequentially...")
+    #     # Process sequentially (easier for debugging)
+    #     completed = 0
+    #     for img in tqdm(images, desc="Processing images"):
+    #         _, success = process_and_save_image(img, bbox)
+    #         if success:
+    #             completed += 1
 
-    else:
-        print(f"Processing {len(images)} images in parallel...")
-        with ProcessPoolExecutor(max_workers=N_JOBS) as executor:
-            # Submit all tasks
-            futures = {executor.submit(process_and_save_image, img): img for img in images}
+    # else:
+    #     print(f"Processing {len(images)} images in parallel...")
+    #     with ProcessPoolExecutor(max_workers=N_JOBS) as executor:
+    #         # Submit all tasks
+    #         futures = {executor.submit(process_and_save_image, img): img for img in images}
 
-            # Process results as they complete
-            completed = 0
-            for future in tqdm(as_completed(futures), total=len(images), desc="Processing images"):
-                try:
-                    output_path, success = future.result()
-                    if success:
-                        completed += 1
-                except Exception as e:
-                    img = futures[future]
-                    print(f"Error processing {img}: {e}")
+    #         # Process results as they complete
+    #         completed = 0
+    #         for future in tqdm(as_completed(futures), total=len(images), desc="Processing images"):
+    #             try:
+    #                 output_path, success = future.result()
+    #                 if success:
+    #                     completed += 1
+    #             except Exception as e:
+    #                 img = futures[future]
+    #                 print(f"Error processing {img}: {e}")
 
-    print(
-        f"Conversion to multiband TIFFs complete: {completed} of {len(images)} images processed successfully."
-    )
+    # print(
+    #     f"Conversion to multiband TIFFs complete: {completed} of {len(images)} images processed successfully."
+    # )
 
     # now merge adjacent tiles taken on same day
     processed_images = sorted(list(DATA_DIR.glob("HLS*_processed.tif")))
-    # merge_adjacent_tiles(processed_images, DATA_DIR, bounds=bbox)
-
+    merge_adjacent_tiles(processed_images, DATA_DIR, bbox=bbox)
